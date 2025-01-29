@@ -81,8 +81,8 @@ La documentation Swagger sera accessible à l'adresse `http://localhost:8080/swa
 
 == Lombok
 
-[quote]
-Un grand pouvoir implique de grandes responsabilités
+[quote, Oncle Ben]
+Avec un grand pouvoir vient une grande responsabilité
 
 Lombok est une bibliothèque qui permet de réduire le code boilerplate en générant automatiquement des méthodes comme les getters, setters et constructeurs.
 
