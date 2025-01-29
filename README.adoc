@@ -24,6 +24,7 @@ Pour exécuter cette application, vous aurez besoin de:
 
 - Java 21
 - Podman / Docker
+- Podman Compose / Docker Compose
 
 == Configuration
 
@@ -33,6 +34,47 @@ Pour configurer l'application, vous devrez définir les variables d'environnemen
 - `SPRING_DATASOURCE_USERNAME`: Nom d'utilisateur de la base de données PostgreSQL
 - `SPRING_DATASOURCE_PASSWORD`: Mot de passe de la base de données PostgreSQL
 - `SPRING_JPA_HIBERNATE_DDL_AUTO`: Stratégie de génération de schéma Hibernate (par exemple, `create`, `update`, `validate`, `none`)
+
+== Démarrage
+
+=== Démarrer la base de données avec Podman/Docker Compose
+
+Pour démarrer une instance PostgreSQL avec Podman ou Docker Compose, utilisez le fichier `compose.yml` fourni.
+
+Exécutez la commande suivante pour démarrer la base de données :
+
+[sources,shell]
+----
+podman-compose up
+----
+
+ou
+
+[sources,shell]
+----
+docker-compose up
+----
+
+=== Démarrer l'API avec Maven
+
+Pour démarrer l'application Spring Boot avec Maven, utilisez les commandes suivantes :
+
+Nettoyez et compilez le projet :
+
+[sources,shell]
+----
+./mvnw clean install
+----
+
+Démarrez l'application :
+
+[sources,shell]
+----
+./mvnw spring-boot:run
+----
+
+L'application sera accessible à l'adresse `http://localhost:8080`.
+La documentation Swagger sera accessible à l'adresse `http://localhost:8080/swagger-ui/index.html`.
 
 == Lombok
 
@@ -134,7 +176,8 @@ public class User {
 
 === Bonnes pratiques
 - Utiliser Lombok pour réduire le code boilerplate et améliorer la lisibilité.
-- Ne pas abuser des annotations Lombok pour éviter la complexité.
+- Toujours vérifier que les annotations Lombok sont compatibles avec les versions de votre projet.
+- Utiliser `@Data` pour générer automatiquement les méthodes `toString`, `equals`, `hashCode`, `getter` et `setter`.
 
 == MapStruct
 
