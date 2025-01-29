@@ -14,6 +14,9 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
+Ce projet est sous licence EUPL-1.2 (European Union Public Licence v. 1.2). Voir le fichier link:LICENSE.md[LICENCE.md] pour plus de détails.
+
+
 == Introduction
 
 Ce projet est un exemple d'application Spring Boot qui utilise une base de données PostgreSQL. Il comprend des fonctionnalités de base pour la gestion des utilisateurs, y compris la création, la récupération et la suppression d'utilisateurs.
