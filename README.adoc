@@ -1,0 +1,45 @@
+= Spring Boot Sample
+Antonin Rouxel
+
+:idprefix:
+:idseparator: -
+:source-language: java
+ifndef::env-github[:icons: font]
+ifdef::env-github[]
+:status:
+:caution-caption: :fire:
+:important-caption: :exclamation:
+:note-caption: :paperclip:
+:tip-caption: :bulb:
+:warning-caption: :warning:
+endif::[]
+
+== Introduction
+
+Ce projet est un exemple d'application Spring Boot qui utilise une base de données PostgreSQL. Il comprend des fonctionnalités de base pour la gestion des utilisateurs, y compris la création, la récupération et la suppression d'utilisateurs.
+
+
+== Prérequis
+
+Pour exécuter cette application, vous aurez besoin de:
+
+- Java 21
+- Podman / Docker
+
+== Configuration
+
+Pour configurer l'application, vous devrez définir les variables d'environnement suivantes:
+
+- `SPRING_DATASOURCE_URL`: URL de la base de données PostgreSQL
+- `SPRING_DATASOURCE_USERNAME`: Nom d'utilisateur de la base de données PostgreSQL
+- `SPRING_DATASOURCE_PASSWORD`: Mot de passe de la base de données PostgreSQL
+- `SPRING_JPA_HIBERNATE_DDL_AUTO`: Stratégie de génération de schéma Hibernate (par exemple, `create`, `update`, `validate`, `none`)
+
+== Structure du projet
+
+Le projet est structuré comme suit:
+
+- `src/main/java/eu/anrouxel/springbootsample`: Contient les classes Java de l'application
+- `src/main/resources`: Contient les ressources de l'application, y compris les fichiers de configuration
+- `src/test/java/eu/anrouxel/springbootsample`: Contient les tests unitaires de l'application
+
