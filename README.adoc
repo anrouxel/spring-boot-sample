@@ -281,7 +281,7 @@ Cette méthode permet d'ajouter un nouvel utilisateur à la base de données.
 ----
 @PostMapping
 public ResponseEntity<UserDTO> createUser(
-        @RequestBody @Valid CreateUserDTO createUserDTO
+    @RequestBody @Valid CreateUserDTO createUserDTO
 ) {
     return ResponseEntity.ok(userService.createUser(createUserDTO));
 }
@@ -298,7 +298,7 @@ Cette méthode permet de récupérer un utilisateur à partir de son identifiant
 ----
 @GetMapping("{id}")
 public ResponseEntity<UserDTO> getUserById(
-        @PathVariable("id") UUID id
+    @PathVariable("id") UUID id
 ) {
     return ResponseEntity.ok(userService.getUserById(id).orElse(null));
 }
@@ -315,7 +315,7 @@ Cette méthode supprime un utilisateur en fonction de son identifiant.
 ----
 @DeleteMapping("{id}")
 public ResponseEntity<Void> deleteUser(
-        @PathVariable("id") UUID id
+    @PathVariable("id") UUID id
 ) {
     userService.deleteUser(id);
     return ResponseEntity.noContent().build();
