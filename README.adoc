@@ -134,8 +134,7 @@ public class User {
 
 === Bonnes pratiques
 - Utiliser Lombok pour réduire le code boilerplate et améliorer la lisibilité.
-- Toujours vérifier que les annotations Lombok sont compatibles avec les versions de votre projet.
-- Utiliser `@Data` pour générer automatiquement les méthodes `toString`, `equals`, `hashCode`, `getter` et `setter`.
+- Ne pas abuser des annotations Lombok pour éviter la complexité.
 
 == MapStruct
 
