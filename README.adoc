@@ -18,7 +18,6 @@ endif::[]
 
 Ce projet est un exemple d'application Spring Boot qui utilise une base de données PostgreSQL. Il comprend des fonctionnalités de base pour la gestion des utilisateurs, y compris la création, la récupération et la suppression d'utilisateurs.
 
-
 == Prérequis
 
 Pour exécuter cette application, vous aurez besoin de:
@@ -35,11 +34,488 @@ Pour configurer l'application, vous devrez définir les variables d'environnemen
 - `SPRING_DATASOURCE_PASSWORD`: Mot de passe de la base de données PostgreSQL
 - `SPRING_JPA_HIBERNATE_DDL_AUTO`: Stratégie de génération de schéma Hibernate (par exemple, `create`, `update`, `validate`, `none`)
 
+== Lombok
+
+Lombok est une bibliothèque qui permet de réduire le code boilerplate en générant automatiquement des méthodes comme les getters, setters et constructeurs.
+
+=== @Getter et @Setter
+
+Les annotations `@Getter` et `@Setter` génèrent automatiquement les méthodes getter et setter pour tous les champs de la classe.
+
+Exemple :
+
+----
+@Getter
+@Setter
+public class User {
+    private String name;
+    private String email;
+}
+----
+
+Équivalent sans Lombok :
+
+----
+public class User {
+    private String name;
+    private String email;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+}
+----
+
+=== @NoArgsConstructor
+
+L'annotation `@NoArgsConstructor` génère un constructeur sans arguments.
+
+Exemple :
+
+----
+@NoArgsConstructor
+public class User {
+    private String name;
+    private String email;
+}
+----
+
+Équivalent sans Lombok :
+
+----
+public class User {
+    private String name;
+    private String email;
+
+    public User() {
+    }
+}
+----
+
+=== @AllArgsConstructor
+
+L'annotation `@AllArgsConstructor` génère un constructeur avec un argument pour chaque champ de la classe.
+
+Exemple :
+
+----
+@AllArgsConstructor
+public class User {
+    private String name;
+    private String email;
+}
+----
+
+Équivalent sans Lombok :
+
+----
+public class User {
+    private String name;
+    private String email;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+}
+----
+
+=== Bonnes pratiques
+- Utiliser Lombok pour réduire le code boilerplate et améliorer la lisibilité.
+- Toujours vérifier que les annotations Lombok sont compatibles avec les versions de votre projet.
+- Utiliser `@Data` pour générer automatiquement les méthodes `toString`, `equals`, `hashCode`, `getter` et `setter`.
+
+== MapStruct
+
+Les mappers convertissent entre les entités et les DTO. MapStruct est utilisé pour générer automatiquement les implémentations.
+
+----
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+    @Mapping(target = "id", ignore = true)
+    UserEntity createUserDTOToUser(CreateUserDTO createUserDTO);
+
+    UserDTO userToUserDTO(UserEntity user);
+}
+----
+
+L'annotation `@Mapping` est utilisée pour spécifier comment les champs doivent être mappés entre les objets source et cible. Dans cet exemple, le champ `id` est ignoré lors du mappage de `CreateUserDTO` vers `UserEntity`.
+
+Équivalent sans MapStruct :
+
+----
+public class UserMapperImpl implements UserMapper {
+    @Override
+    public UserEntity createUserDTOToUser(CreateUserDTO createUserDTO) {
+        if (createUserDTO == null) {
+            return null;
+        }
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setName(createUserDTO.getName());
+        userEntity.setEmail(createUserDTO.getEmail());
+        userEntity.setPassword(createUserDTO.getPassword());
+        // id is ignored
+
+        return userEntity;
+    }
+
+    @Override
+    public UserDTO userToUserDTO(UserEntity user) {
+        if (user == null) {
+            return null;
+        }
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setName(user.getName());
+        userDTO.setEmail(user.getEmail());
+
+        return userDTO;
+    }
+}
+----
+
+=== Bonnes pratiques
+- Utiliser MapStruct pour réduire le code de mappage manuel et améliorer la maintenabilité.
+- Toujours spécifier explicitement les mappings pour éviter les erreurs de mappage implicites.
+- Utiliser des tests unitaires pour vérifier les mappings générés.
+
 == Structure du projet
 
 Le projet est structuré comme suit:
 
-- `src/main/java/eu/anrouxel/springbootsample`: Contient les classes Java de l'application
-- `src/main/resources`: Contient les ressources de l'application, y compris les fichiers de configuration
-- `src/test/java/eu/anrouxel/springbootsample`: Contient les tests unitaires de l'application
+* `src/main/java/eu/anrouxel/springbootsample`: Contient les classes Java de l'application
+** `controller`: Contient les classes de contrôleur Spring MVC qui gèrent les requêtes HTTP.
+** `dto`: Contient les classes Data Transfer Object utilisées pour transférer des données entre les couches de l'application.
+** `mapper`: Contient les classes de mappage pour convertir entre les entités et les DTO.
+** `service`: Contient les classes de service qui implémentent la logique métier de l'application.
+** `entity`: Contient les classes d'entité JPA qui représentent les tables de la base de données.
+** `repository`: Contient les interfaces de repository Spring Data JPA pour accéder aux données.
+* `src/main/resources`: Contient les ressources de l'application, y compris les fichiers de configuration.
+* `src/test/java/eu/anrouxel/springbootsample`: Contient les tests unitaires de l'application.
 
+== Explication des éléments
+
+=== Controller
+
+Les contrôleurs gèrent les requêtes HTTP et retournent les réponses appropriées.
+
+==== Création du contrôleur
+
+Le contrôleur est annoté avec `@RestController` pour indiquer qu'il s'agit d'un contrôleur Spring MVC. La dépendance `UserService` est injectée via le constructeur grâce à Lombok, qui crée automatiquement le constructeur.
+
+----
+@RestController
+@RequestMapping("/users")
+@AllArgsConstructor
+public class UserController {
+    private final UserService userService;
+}
+----
+
+==== Ajout d'un utilisateur
+
+Cette méthode permet d'ajouter un nouvel utilisateur à la base de données.
+
+`@PostMapping` : Indique que cette méthode répond aux requêtes HTTP POST.
+
+`@RequestBody` : Indique que le corps de la requête doit être transformé en un objet Java.
+
+`@Valid` : Valide les champs de l'objet reçu selon les annotations de validation.
+
+----
+@PostMapping
+public ResponseEntity<UserDTO> createUser(
+        @RequestBody @Valid CreateUserDTO createUserDTO
+) {
+    return ResponseEntity.ok(userService.createUser(createUserDTO));
+}
+----
+
+==== Récupération d'un utilisateur par ID
+
+Cette méthode permet de récupérer un utilisateur à partir de son identifiant unique.
+
+`@GetMapping("{id}")` : Indique que cette méthode répond aux requêtes HTTP GET contenant un identifiant dans l'URL.
+
+`@PathVariable("id")` : Extrait l'identifiant depuis l'URL et le transmet à la méthode.
+
+----
+@GetMapping("{id}")
+public ResponseEntity<UserDTO> getUserById(
+        @PathVariable("id") UUID id
+) {
+    return ResponseEntity.ok(userService.getUserById(id).orElse(null));
+}
+----
+
+==== Suppression d'un utilisateur
+
+Cette méthode supprime un utilisateur en fonction de son identifiant.
+
+`@DeleteMapping("{id}")` : Indique que cette méthode répond aux requêtes HTTP DELETE contenant un identifiant dans l'URL.
+
+`@PathVariable("id")` : Récupère l'identifiant de l'utilisateur à supprimer.
+
+----
+@DeleteMapping("{id}")
+public ResponseEntity<Void> deleteUser(
+        @PathVariable("id") UUID id
+) {
+    userService.deleteUser(id);
+    return ResponseEntity.noContent().build();
+}
+----
+
+=== Bonnes pratiques
+- Utiliser des annotations de validation pour garantir l'intégrité des données reçues.
+- Gérer les exceptions de manière centralisée pour améliorer la lisibilité et la maintenabilité du code.
+- Documenter les endpoints avec Swagger pour faciliter l'intégration et les tests.
+
+=== DTO (Data Transfer Object)
+Les DTO sont utilisés pour transférer des données entre les couches de l'application, en particulier entre le contrôleur et le service. Ils permettent de s'assurer que seules les données nécessaires sont exposées et transférées. Le contrôleur expose les DTO comme modèle pour les réponses HTTP et les utilise pour recevoir les données des requêtes.
+
+==== DTO pour l'utilisateur
+
+Le `UserDTO` est utilisé pour transférer les informations de l'utilisateur.
+
+----
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserDTO {
+    private UUID id;
+    private String name;
+    private String email;
+}
+----
+
+==== DTO pour la création d'utilisateur
+
+Le `CreateUserDTO` est utilisé pour transférer les informations nécessaires à la création d'un nouvel utilisateur. Il inclut des validations pour s'assurer que les données sont correctes.
+
+----
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CreateUserDTO {
+    @NotBlank(message = "Name is mandatory")
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    private String name;
+
+    @Email(message = "Email should be valid")
+    @NotBlank(message = "Email is mandatory")
+    private String email;
+
+    @NotBlank(message = "Password is mandatory")
+    @Size(min = 8, message = "Password must be at least 8 characters long")
+    private String password;
+}
+----
+
+==== Validation des DTO
+
+La validation des DTO est essentielle pour garantir que les données reçues par l'application sont correctes et complètes. Spring Boot utilise les annotations de validation de Bean Validation (JSR 380) pour valider les champs des DTO. Voici quelques annotations couramment utilisées :
+
+- `@NotBlank` : Vérifie que le champ n'est pas null et que la chaîne n'est pas vide.
+- `@Size` : Vérifie que la taille de la chaîne est dans les limites spécifiées.
+- `@Email` : Vérifie que la chaîne est une adresse email valide.
+- `@NotNull` : Vérifie que le champ n'est pas null.
+
+=== Bonnes pratiques
+- Utiliser des DTO pour séparer les couches de l'application et améliorer la sécurité.
+- Valider les DTO pour garantir que les données reçues sont correctes et complètes.
+- Utiliser des DTO spécifiques pour chaque opération (création, mise à jour, etc.) pour éviter les erreurs.
+
+=== Service
+
+Les services contiennent la logique métier de l'application.
+
+==== Création du service
+
+Le service est annoté avec `@Service` pour indiquer qu'il s'agit d'un composant Spring. La dépendance `UserMapper` et `UserRepository` est injectée via le constructeur grâce à Lombok, qui crée automatiquement le constructeur.
+
+----
+@Service
+@AllArgsConstructor
+public class UserService {
+    private final UserMapper userMapper;
+    private final UserRepository userRepository;
+}
+----
+
+==== Création d'un utilisateur
+
+Cette méthode permet de créer un nouvel utilisateur dans la base de données.
+
+----
+public UserDTO createUser(CreateUserDTO createUserDTO) {
+    UserEntity user = userMapper.createUserDTOToUser(createUserDTO);
+    userRepository.save(user);
+    return userMapper.userToUserDTO(user);
+}
+----
+
+==== Récupération d'un utilisateur par ID
+
+Cette méthode permet de récupérer un utilisateur à partir de son identifiant unique.
+
+----
+public Optional<UserDTO> getUserById(UUID id) {
+    return userRepository.findById(id).map(userMapper::userToUserDTO);
+}
+----
+
+==== Suppression d'un utilisateur
+
+Cette méthode supprime un utilisateur en fonction de son identifiant.
+
+----
+public void deleteUser(UUID id) {
+    userRepository.deleteById(id);
+}
+----
+
+=== Bonnes pratiques
+- Utiliser des services pour encapsuler la logique métier et améliorer la maintenabilité.
+
+=== Mapper (MapStruct)
+Les mappers convertissent entre les entités et les DTO. MapStruct est utilisé pour générer automatiquement les implémentations.
+
+----
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+    @Mapping(target = "id", ignore = true)
+    UserEntity createUserDTOToUser(CreateUserDTO createUserDTO);
+
+    UserDTO userToUserDTO(UserEntity user);
+}
+----
+
+L'annotation `@Mapping` est utilisée pour spécifier comment les champs doivent être mappés entre les objets source et cible. Dans cet exemple, le champ `id` est ignoré lors du mappage de `CreateUserDTO` vers `UserEntity`.
+
+Équivalent sans MapStruct :
+
+----
+public class UserMapperImpl implements UserMapper {
+    @Override
+    public UserEntity createUserDTOToUser(CreateUserDTO createUserDTO) {
+        if (createUserDTO == null) {
+            return null;
+        }
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setName(createUserDTO.getName());
+        userEntity.setEmail(createUserDTO.getEmail());
+        userEntity.setPassword(createUserDTO.getPassword());
+        // id is ignored
+
+        return userEntity;
+    }
+
+    @Override
+    public UserDTO userToUserDTO(UserEntity user) {
+        if (user == null) {
+            return null;
+        }
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setName(user.getName());
+        userDTO.setEmail(user.getEmail());
+
+        return userDTO;
+    }
+}
+----
+
+=== Bonnes pratiques
+- Utiliser MapStruct pour réduire le code de mappage manuel et améliorer la maintenabilité.
+
+=== Entity
+Les entités représentent les tables de la base de données. Elles sont annotées avec `@Entity` pour indiquer qu'il s'agit d'une entité JPA. Les champs de l'entité sont mappés aux colonnes de la table de la base de données.
+
+==== Annotations couramment utilisées
+- `@Id` : Indique le champ identifiant de l'entité.
+- `@GeneratedValue` : Spécifie la stratégie de génération de la valeur de l'identifiant.
+- `@Column` : Utilisé pour spécifier les détails de la colonne de la base de données.
+- `@Table` : Spécifie le nom de la table dans la base de données.
+
+==== Exemple d'entité utilisateur
+----
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "users")
+public class UserEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "name", nullable = false, length = 50)
+    private String name;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "password", nullable = false)
+    private String password;
+}
+----
+
+==== Explications des annotations
+- `@Table(name = "users")` : Spécifie le nom de la table dans la base de données.
+- `@Column` : Définit les propriétés des colonnes, telles que `nullable`, `unique`, et `length`.
+
+==== Bonnes pratiques
+- Utiliser des noms de colonnes explicites avec `@Column`.
+- Définir des contraintes de base de données telles que `nullable` et `unique` pour assurer l'intégrité des données.
+- Utiliser des types de données appropriés pour les champs de l'entité.
+
+Note : Si `@Table` ou `@Column` ne sont pas définis, JPA utilisera par défaut le nom de la classe pour la table et le nom des attributs pour les colonnes.
+
+=== Repository
+Les repositories accèdent aux données en utilisant Spring Data JPA. Ils permettent également de définir des méthodes de recherche personnalisées en suivant les conventions de nommage de Spring Data JPA.
+
+----
+public interface UserRepository extends JpaRepository<UserEntity, UUID> {
+    Optional<UserEntity> findByEmail(String email);
+    List<UserEntity> findByNameContaining(String name);
+}
+----
+
+==== Conventions de nommage de Spring Data JPA
+
+Spring Data JPA génère automatiquement les implémentations des méthodes de recherche en suivant des conventions de nommage spécifiques. Voici quelques exemples de conventions couramment utilisées :
+
+- `findBy`: Préfixe utilisé pour indiquer une méthode de recherche.
+- `And`, `Or`: Utilisés pour combiner plusieurs critères de recherche.
+- `Containing`, `Between`, `LessThan`, `GreaterThan`, etc.: Utilisés pour créer des méthodes de recherche plus complexes.
+
+Exemples :
+- `findByEmail(String email)`: Recherche un utilisateur par son adresse email.
+- `findByNameContaining(String name)`: Recherche les utilisateurs dont le nom contient la chaîne spécifiée.
+- `findByNameAndEmail(String name, String email)`: Recherche un utilisateur par son nom et son adresse email.
+- `findByNameOrEmail(String name, String email)`: Recherche un utilisateur par son nom ou son adresse email.
+
+==== Bonnes pratiques
+- Utiliser des méthodes de recherche personnalisées pour éviter d'écrire des requêtes SQL manuelles.
+- Suivre les conventions de nommage de Spring Data JPA pour générer automatiquement les implémentations des méthodes de recherche.
+- Utiliser des types de retour appropriés, comme `Optional` pour les résultats uniques et `List` pour les collections de résultats.
