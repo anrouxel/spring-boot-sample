@@ -45,14 +45,14 @@ Exécutez la commande suivante pour démarrer la base de données :
 
 [sources,shell]
 ----
-podman-compose up
+podman compose up -d
 ----
 
 ou
 
 [sources,shell]
 ----
-docker-compose up
+docker compose up -d
 ----
 
 === Démarrer l'API avec Maven
