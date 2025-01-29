@@ -81,6 +81,11 @@ La documentation Swagger sera accessible à l'adresse `http://localhost:8080/swa
 
 == Lombok
 
+[quote]
+____
+Un grand pouvoir implique de grandes responsabilités
+____
+
 Lombok est une bibliothèque qui permet de réduire le code boilerplate en générant automatiquement des méthodes comme les getters, setters et constructeurs.
 
 === @Getter et @Setter
@@ -179,8 +184,7 @@ public class User {
 
 === Bonnes pratiques
 - Utiliser Lombok pour réduire le code boilerplate et améliorer la lisibilité.
-- Toujours vérifier que les annotations Lombok sont compatibles avec les versions de votre projet.
-- Utiliser `@Data` pour générer automatiquement les méthodes `toString`, `equals`, `hashCode`, `getter` et `setter`.
+- Ne pas abuser des annotations Lombok, car cela pourrait exposer trop de données.
 
 == MapStruct
 
