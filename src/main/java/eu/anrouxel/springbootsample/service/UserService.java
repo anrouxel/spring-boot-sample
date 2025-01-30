@@ -5,17 +5,16 @@ import eu.anrouxel.springbootsample.dto.UserDTO;
 import eu.anrouxel.springbootsample.entity.UserEntity;
 import eu.anrouxel.springbootsample.mapper.UserMapper;
 import eu.anrouxel.springbootsample.repository.UserRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class UserService {
-    private UserMapper userMapper;
-    private UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
     public UserDTO createUser(CreateUserDTO createUserDTO) {
         UserEntity user = userMapper.createUserDTOToUser(createUserDTO);
